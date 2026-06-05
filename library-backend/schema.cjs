@@ -100,6 +100,7 @@ const typeDefs = /* GraphQL */ `
 
   type AuthorBookCount {
     name: String!
+    born: Int
     bookCount: Int
   }
 
@@ -151,15 +152,25 @@ const resolvers = {
         const result2 = books.filter(
           (book) => book.author.toLowerCase() === author.name.toLowerCase()
         );
-        return { name: author.name, bookCount: result2.length };
+        return {
+          name: author.name,
+          born: author.born,
+          bookCount: result2.length,
+        };
       });
       return result;
     },
   },
   Mutation: {
     addBook: (root, args) => {
+      const author = authors.find(
+        (author) => author.name.toLowerCase() === args.author.toLowerCase()
+      );
+      if (!author) {
+        authors = authors.concat({ name: args.author, id: uuid() });
+      }
       const book = { ...args, id: uuid() };
-      const books = books.concat(book);
+      books = books.concat(book);
       return book;
     },
   },
