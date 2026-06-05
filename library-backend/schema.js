@@ -94,10 +94,10 @@ export const typeDefs = /* GraphQL */ `
     published: String!
     author: String!
     id: String!
-    genres: [String!]
+    genres: [String!]!
   }
 
-  type AllAuthor {
+  type AuthorBookCount {
     name: String!
     bookCount: Int
   }
@@ -106,8 +106,8 @@ export const typeDefs = /* GraphQL */ `
     dummy: Int
     bookCount: Int!
     authorCount: Int!
-    allBooks: [Book!]!
-    allAuthors: [AllAuthor!]!
+    allBooks(author: String, genre: String): [Book!]!
+    allAuthors: [AuthorBookCount!]!
   }
 `;
 
@@ -120,8 +120,33 @@ export const resolvers = {
     authorCount: () => {
       return authors.length;
     },
-    allBooks: () => {
-      return books;
+    allBooks: (root, args) => {
+      if (args.genre && args.author) {
+        const bookResult = books.filter(
+          (book) =>
+            book.genres.includes(args.genre) && book.author === args.author
+        );
+        return bookResult.map((book) => ({
+          title: book.title,
+          author: book.author,
+        }));
+      }
+      if (args.author) {
+        const bookResult = books.filter(
+          (book) => book.author.toLowerCase() === args.author.toLowerCase()
+        );
+        return bookResult.map((book) => ({ title: book.title }));
+      }
+      if (args.genre) {
+        const bookResult = books.filter((book) =>
+          book.genres.includes(args.genre)
+        );
+
+        return bookResult.map((book) => ({
+          title: book.title,
+          author: book.author,
+        }));
+      }
     },
     allAuthors: () => {
       const result = authors.map((author) => {
