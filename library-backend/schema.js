@@ -97,10 +97,17 @@ export const typeDefs = /* GraphQL */ `
     genres: [String!]
   }
 
+  type AllAuthor {
+    name: String!
+    bookCount: Int
+  }
+
   type Query {
     dummy: Int
     bookCount: Int!
     authorCount: Int!
+    allBooks: [Book!]!
+    allAuthors: [AllAuthor!]!
   }
 `;
 
@@ -112,6 +119,18 @@ export const resolvers = {
     },
     authorCount: () => {
       return authors.length;
+    },
+    allBooks: () => {
+      return books;
+    },
+    allAuthors: () => {
+      const result = authors.map((author) => {
+        const result2 = books.filter(
+          (book) => book.author.toLowerCase() === author.name.toLowerCase()
+        );
+        return { name: author.name, bookCount: result2.length };
+      });
+      return result;
     },
   },
 };
