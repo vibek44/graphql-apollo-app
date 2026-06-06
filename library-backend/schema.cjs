@@ -109,8 +109,8 @@ const typeDefs = `#graphql  #graphql enables  code highlighting in ide that supp
     dummy: Int
     bookCount: Int!
     authorCount: Int!
-    allBooks(author: String, genre: String): [Book!]!
-    allAuthors: [AuthorBookCount!]!
+    allBook(author: String, genre: String): [Book!]!
+    allAuthor: [AuthorBookCount!]!
   }
   type Mutation {
     addBook(
@@ -132,7 +132,7 @@ const resolvers = {
     authorCount: () => {
       return authors.length;
     },
-    allBooks: (root, args) => {
+    allBook: (root, args) => {
       if (args.genre && args.author) {
         return books.filter(
           (book) =>
@@ -149,7 +149,7 @@ const resolvers = {
       }
       return books;
     },
-    allAuthors: () => {
+    allAuthor: () => {
       const result = authors.map((author) => {
         const result2 = books.filter(
           (book) => book.author.toLowerCase() === author.name.toLowerCase()
