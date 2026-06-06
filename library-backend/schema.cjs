@@ -1,4 +1,5 @@
 const { v1: uuid } = require("uuid");
+const { GraphQLError } = require("graphql");
 let authors = [
   {
     name: "Robert Martin",
@@ -83,7 +84,7 @@ let books = [
     genres: ["classic", "revolution"],
   },
 ];
-const typeDefs = /* GraphQL */ `
+const typeDefs = `#graphql  #graphql enables  code highlighting in ide that support graphql highlight
   type Author {
     name: String!
     id: String!
@@ -92,7 +93,7 @@ const typeDefs = /* GraphQL */ `
 
   type Book {
     title: String!
-    published: String!
+    published: Int!
     author: String!
     id: String!
     genres: [String!]!
@@ -115,9 +116,10 @@ const typeDefs = /* GraphQL */ `
     addBook(
       title: String!
       author: String!
-      published: String!
+      published: Int!
       genres: [String!]!
     ): Book!
+    editAuthor(name: String!, born: Int): Author!
   }
 `;
 
@@ -172,6 +174,20 @@ const resolvers = {
       const book = { ...args, id: uuid() };
       books = books.concat(book);
       return book;
+    },
+    editAuthor: (root, args) => {
+      let author = authors.find((author) => author.name === args.name);
+      if (!author) {
+        throw new GraphQLError(` ${args.name} Should be in the list to edit`, {
+          extensions: {
+            code: "BAD_USER_INPUT",
+            invalidArgs: args.name,
+          },
+        });
+      }
+      author = { ...author, born: args.born };
+      authors = authors.map((ele) => (ele.name === args.name ? author : ele));
+      return author;
     },
   },
 };
