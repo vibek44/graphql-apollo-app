@@ -1,7 +1,7 @@
 import { ALL_AUTHOR, EDIT_AUTHOR } from "../queries";
 import { useMutation, useQuery } from "@apollo/client/react";
 import { useState } from "react";
-const Authors = (props) => {
+const Authors = ({ show, token }) => {
   const [name, setName] = useState("");
   const [born, setBorn] = useState("");
 
@@ -12,7 +12,7 @@ const Authors = (props) => {
     onError: (error) => console.log(error.message),
   });
 
-  if (!props.show) {
+  if (!show) {
     return null;
   }
 
@@ -22,7 +22,6 @@ const Authors = (props) => {
   //console.log(data);
   const submit = (e) => {
     e.preventDefault();
-    //console.log(name);
     editAuthor({ variables: { name, born } });
     setBorn("");
   };
@@ -45,32 +44,34 @@ const Authors = (props) => {
           ))}
         </tbody>
       </table>
-      <div>
-        <h3>Set birthyear</h3>
-        <form onSubmit={submit}>
-          <label htmlFor="born">name</label>
-          <select
-            name="author"
-            id="author"
-            onChange={(e) => setName(e.target.value)}
-          >
-            <option>select author</option>
-            {data.allAuthor.map((author, index) => (
-              <option key={author.name} value={author.name}>
-                {author.name}
-              </option>
-            ))}
-          </select>
-          <br />
-          <label htmlFor="born">born</label>
-          <input
-            type="number"
-            value={born}
-            onChange={({ target }) => setBorn(Number(target.value))}
-          />
-          <button type="submit">update author</button>
-        </form>
-      </div>
+      {token && (
+        <div>
+          <h3>Set birthyear</h3>
+          <form onSubmit={submit}>
+            <label htmlFor="born">name</label>
+            <select
+              name="author"
+              id="author"
+              onChange={(e) => setName(e.target.value)}
+            >
+              <option>select author</option>
+              {data.allAuthor.map((author, index) => (
+                <option key={author.name} value={author.name}>
+                  {author.name}
+                </option>
+              ))}
+            </select>
+            <br />
+            <label htmlFor="born">born</label>
+            <input
+              type="number"
+              value={born}
+              onChange={({ target }) => setBorn(Number(target.value))}
+            />
+            <button type="submit">update author</button>
+          </form>
+        </div>
+      )}
     </div>
   );
 };
