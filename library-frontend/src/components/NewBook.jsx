@@ -8,29 +8,33 @@ const NewBook = (props) => {
   const [published, setPublished] = useState("");
   const [genre, setGenre] = useState("");
   const [genres, setGenres] = useState([]);
-  const [createBook] = useMutation(
-    CREATE_BOOK,
-
-    {
-      refetchQueries: [{ query: ALL_BOOK }, { query: ALL_AUTHOR }],
-      onError: (error) => console.log(error.message),
-    }
-  );
+  const [createBook] = useMutation(CREATE_BOOK, {
+    onCompleted: (data) => {
+      props.setPage("books");
+    },
+    //refetchQueries: [{ query: ALL_BOOK }, { query: ALL_AUTHOR }],
+    //function to update cache manually
+    update: (cache, response) => {
+      cache.updateQuery({ query: ALL_BOOK }, ({ allBook }) => {
+        return {
+          allBook: allBook.concat(response.data.addBook),
+        };
+      });
+    },
+    onError: (error) => console.log(error.message),
+  });
 
   if (!props.show) {
     return null;
   }
-
   const submit = async (event) => {
     event.preventDefault();
-    console.log(title, author, published, genres);
     createBook({ variables: { title, author, published, genres } });
-    /*
     setTitle("");
     setPublished("");
-    setAuthor(""); 
+    setAuthor("");
     setGenres([]);
-    setGenre("");*/
+    setGenre("");
   };
 
   const addGenre = () => {
